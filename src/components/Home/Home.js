@@ -1,7 +1,8 @@
 import fetch from 'node-fetch';
 import React, { Component } from 'react';
+import Find from '../Find/Find';
 import './Home.css';
-import env from '../../env.js';
+import env from '../../env';
 
 export default class Home extends Component {
   constructor(props) {
@@ -33,6 +34,7 @@ export default class Home extends Component {
           <h1>Petfinder Search</h1>
           <p>A website to find your perfect pet!</p>
           <p>{this.state.message}</p>
+          <Find />
         </div>
       </div>
     );
