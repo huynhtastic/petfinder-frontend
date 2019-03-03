@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { Select } from 'antd';
+import { Select, Input } from 'antd';
 import React, { Component } from 'react';
 import env from '../../env';
 
@@ -10,11 +10,11 @@ export default class Find extends Component {
     super(props);
     this.state = {
       params: {
-        animal: [],
-        breed: [],
+        animal: {},
+        breed: {},
         size: {},
         sex: {},
-        age: [],
+        age: {},
       },
       selected: {
         animal: '',
@@ -25,10 +25,6 @@ export default class Find extends Component {
         age: '',
       },
     };
-  }
-
-  makeDropdowns() {
-
   }
 
   convertParams(json) {
@@ -60,6 +56,7 @@ export default class Find extends Component {
     console.log('converted params:', params);
     this.setState({params: params});
     console.log(this.state);
+    // TODO: create an option for ---: '' for blank choices for optional params
   }
 
   componentDidMount() {
@@ -80,9 +77,35 @@ export default class Find extends Component {
       });
   }
 
+  makeDropdowns() {
+    // create dropdowns by populating options then the select component
+    var params = this.state.params;
+    // get the category of parameter
+    var selects = [];
+    for (var paramKey in params) {
+      if (params.hasOwnProperty(paramKey)) {
+        // it's a valid category, so we start making Options
+        var paramVal = params[paramKey];
+        var options = [];
+        for (var searchKey in paramVal) {
+          if (paramVal.hasOwnProperty(searchKey)) {
+            options.push(<Option value={paramVal[searchKey]}>{searchKey}</Option>);
+          }
+        }
+        // finished options now need to wrap Select and render
+        // show that it's loading if the parameters haven't been populated
+        var loading = options.length > 0 ? false : true;
+        selects.push(<Select defaultValue='---' loading={loading}>{options}</Select>);
+      }
+    }
+    return selects;
+    // TODO: create dropdown for breed.list
+  }
+
   render() {
     return (
       <div>
+        <Input placeholder='[Zip code] or [City, State]' allowClear />
         {this.makeDropdowns()}
       </div>
     )
