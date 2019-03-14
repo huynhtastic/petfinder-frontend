@@ -27,6 +27,17 @@ export default class Find extends Component {
     };
   }
 
+  onSelect = (value, option) => {
+    console.log(option);
+    this.setState(prevState => ({
+      selected: {
+        ...prevState.selected,
+        [option.props.selectkey]: value
+      }
+    }));
+    console.log(this.state);
+  }
+
   convertParams(json) {
     // convert the params in json to valid key/value pairs for the pet api's
     // query params
@@ -89,13 +100,25 @@ export default class Find extends Component {
         var options = [];
         for (var searchKey in paramVal) {
           if (paramVal.hasOwnProperty(searchKey)) {
-            options.push(<Option value={paramVal[searchKey]}>{searchKey}</Option>);
+            options.push(
+              <Option key={searchKey}
+                selectkey={paramKey}
+                value={paramVal[searchKey]}>
+                {searchKey}
+              </Option>);
           }
         }
         // finished options now need to wrap Select and render
         // show that it's loading if the parameters haven't been populated
         var loading = options.length > 0 ? false : true;
-        selects.push(<Select defaultValue='---' loading={loading}>{options}</Select>);
+        selects.push(
+          <Select key={paramKey}
+            defaultValue='---'
+            loading={loading}
+            onSelect={this.onSelect}
+            optionLabelProp={paramKey}>
+            {options}
+          </Select>);
       }
     }
     return selects;
@@ -105,8 +128,10 @@ export default class Find extends Component {
   render() {
     return (
       <div>
-        <Input placeholder='[Zip code] or [City, State]' allowClear />
-        {this.makeDropdowns()}
+        <form>
+          <Input placeholder='[Zip code] or [City, State]' allowClear />
+          {this.makeDropdowns()}
+        </form>
       </div>
     )
   }
