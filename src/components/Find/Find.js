@@ -9,26 +9,13 @@ export default class Find extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      params: {
-        animal: {},
-        breed: {},
-        size: {},
-        sex: {},
-        age: {},
-      },
-      selected: {
-        animal: '',
-        breed: '',
-        size: '',
-        sex: '',
-        location: '',
-        age: '',
-      },
+      selected: {},
+      types: {},
+      validParams: {},
     };
   }
 
   onSelect = (value, option) => {
-    console.log(option);
     this.setState(prevState => ({
       selected: {
         ...prevState.selected,
@@ -38,98 +25,106 @@ export default class Find extends Component {
     console.log(this.state);
   }
 
-  convertParams(json) {
-    // convert the params in json to valid key/value pairs for the pet api's
-    // query params
-    var params = {};
-    for (var jsonKey in json) {
-      if (json.hasOwnProperty(jsonKey)) {
-        var jsonValue = json[jsonKey];
-        params[jsonKey] = {};
-        if (jsonValue.constructor === Array) {
-          // if it's an array, it means we just make the key a capitalized
-          // version of the value
-          params[jsonKey] = jsonValue.reduce((paramVal, itm) => {
-            var paramKey = itm.charAt(0).toUpperCase() + itm.slice(1);
-            paramVal[paramKey] = itm;
+  //onTextInputChange = (event) => {
 
-            return paramVal;
-          }, {});
-        } else if (Object.prototype.toString.call(jsonValue) === '[object Object]') {
-          // it's an object, so we just assign that to params
-          // we trust i actually capitalized correctly on the backend
-          params[jsonKey] = jsonValue;;
+
+  async componentDidMount() {
+    // fetch the types to populate pet search parameters
+    try {
+      const res = await fetch(`${env.apiUrl}/getTypes`)
+      if (res.status === 404) {
+        alert('Error getting search parameters.');
+      } else {
+        const json = await res.json();
+        if (json) {
+          // It's a valid object, so we set it to state
+          console.log('compdidmount json', json);
+          this.setState(json);
         } else {
-          console.log('found unexpected param:', jsonValue);
+          alert('Empty search parameters.');
         }
       }
+    } catch (err) {
+      console.log(err);
     }
-    console.log('converted params:', params);
-    this.setState({params: params});
-    console.log(this.state);
-    // TODO: create an option for ---: '' for blank choices for optional params
-  }
-
-  componentDidMount() {
-    // fetch the search options to choose from
-    fetch(`${env.apiUrl}/getFindParams`)
-      .then((res) => {
-        if (res.status === 404) {
-          alert("Error getting search parameters");
-        } else {
-          return res.json();
-        }
-      })
-      .then((json) => {
-        if (json) {
-          console.log(json);
-          this.convertParams(json);
-        }
-      });
   }
 
   makeDropdowns() {
     // create dropdowns by populating options then the select component
-    var params = this.state.params;
-    // get the category of parameter
-    var selects = [];
-    for (var paramKey in params) {
-      if (params.hasOwnProperty(paramKey)) {
-        // it's a valid category, so we start making Options
-        var paramVal = params[paramKey];
-        var options = [];
-        for (var searchKey in paramVal) {
-          if (paramVal.hasOwnProperty(searchKey)) {
+    const types = this.state.types;
+    const validParams = this.state.validParams;
+    let formControls = [];
+
+    for (let [validParamName, paramDetails] of Object.entries(validParams)) {
+      const controlType = paramDetails[1];
+      if (controlType === 'text') {
+        const controlAttrs = paramDetails[0];
+        // TODO: assign an onChange function
+        formControls.push(<Input key={validParamName} {...controlAttrs}  />);
+      } else if (controlType === 'select') {
+        const optionValues = paramDetails[0];
+        let options = [];
+        if (!!optionValues.length) {
+          // The array isn't empty so we make options
+          for (let value of optionValues) {
             options.push(
-              <Option key={searchKey}
-                selectkey={paramKey}
-                value={paramVal[searchKey]}>
-                {searchKey}
+              <Option key={value}
+                selectkey={validParamName}
+                value={value}>
+                {value}
               </Option>);
           }
         }
-        // finished options now need to wrap Select and render
-        // show that it's loading if the parameters haven't been populated
-        var loading = options.length > 0 ? false : true;
-        selects.push(
-          <Select key={paramKey}
+        const loading = options.length > 0 ? false : true;
+        formControls.push(
+          <Select key={validParamName}
             defaultValue='---'
             loading={loading}
-            onSelect={this.onSelect}
-            optionLabelProp={paramKey}>
+            onSelect={this.onSelect} >
             {options}
           </Select>);
       }
     }
-    return selects;
-    // TODO: create dropdown for breed.list
+    return formControls;
+
+    // get the category of parameter
+      //    let selects = [];
+      //    for (let [animal, animalParams] of Object.entries(types)) {
+      //      if (types.hasOwnProperty(animal)) {
+      //        for (let [animalParam, paramValues] of Object.entries(animalParams)) {
+      //          if (animalParam !== '_links') {
+      //            // valid search param, so we create Options
+      //            let options = [];
+      //            for (let value of paramValues) {
+      //              options.push(
+      //                <Option key={value}
+      //                  selectkey={animalParam}
+      //                  value={value}>
+      //                  {value}
+      //                </Option>);
+      //            }
+      //            const loading = options.length > 0 ? false : true;
+      //            selects.push(
+      //              <Select key={animalParam}
+      //                defaultValue='---'
+      //                loading={loading}
+      //                onSelect={this.onSelect} >
+      //                {options}
+      //              </Select>);
+      //          }
+      //        }
+      //        // finished options now need to wrap Select and render
+      //        // show that it's loading if the parameters haven't been populated
+      //      }
+      //    }
+      //    return selects;
+      //    // TODO: create dropdown for breed.list
   }
 
   render() {
     return (
       <div>
         <form>
-          <Input placeholder='[Zip code] or [City, State]' allowClear />
           {this.makeDropdowns()}
         </form>
       </div>

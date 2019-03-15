@@ -14,17 +14,17 @@ export default class Home extends Component {
   }
 
   componentDidMount() {
-    fetch(`${env.apiUrl}/`)
-      .then((res) => {
-        if (res.status === 200) {
-          console.log(res);
-          return res.json();
-        }
-      })
-      .then((json) => {
-        console.log(json);
+    //    fetch(`${env.apiUrl}/`)
+    //      .then((res) => {
+    //        if (res.status === 200) {
+    //          console.log(res);
+    //          return res.json();
+    //        }
+    //      })
+    //      .then((json) => {
+    //        console.log(json);
         //this.setState({message: json.message});
-      })
+    //      })
   }
 
   render() {
