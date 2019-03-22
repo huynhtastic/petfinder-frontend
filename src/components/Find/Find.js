@@ -1,3 +1,4 @@
+import buildUrl from 'build-url';
 import fetch from 'node-fetch';
 import { Select, Input } from 'antd';
 import React, { Component } from 'react';
@@ -16,18 +17,86 @@ export default class Find extends Component {
     };
   }
 
-  onSelect = (value, option) => {
-    this.setState(prevState => ({
-      selected: {
-        ...prevState.selected,
-        [option.props.selectkey]: value
-      }
-    }));
-    console.log(this.state);
+  /**
+   * Creates an option based on key, select key, value, and text given.
+   *
+   * @param {string} key - Key prop for object.
+   * @param {string} selectkey - Selectkey prop to link object to a dropdown.
+   * @param {object} optionals -
+   *  {string} value={@param key} - Value prop to pass for Option.
+   *  {string} text={@param key} - Key prop for text to show for this Option.
+   *
+   * @returns {Option} - Clickable option to pass to a Select.
+   */
+  generateOption(key, selectkey, {value=key, text=key} = {}) {
+    return <Option key={key}
+      selectkey={selectkey}
+      value={value}>
+      {text}
+    </Option>;
   }
 
-  //onTextInputChange = (event) => {
-
+  /**
+   * Changes state to reflect chosen values by user. If the user chooses a new
+   * type of animal, change choices for each Select that is dependent on the
+   * type of animal. If breeds choices is not present, fetch from backend and
+   * cache the results if the user decides to click on a previously chosen type
+   * of animal.
+   *
+   * @param {string} value - Value of option selected from a dropdown.
+   * @param {Option} option - Option object of selected value from a dropdown.
+   */
+  onSelect = async (value, option) => {
+    let newOptions = {};
+    let fetchedBreeds = undefined;
+    if (option.props.selectkey === 'type') {
+      if (!this.state.types[value]['breed']) {
+        // We only need to fetch Breeds if it's not there
+        try {
+          const url = buildUrl(env.apiUrl, {
+            path: 'getBreeds',
+            queryParams: { type: value },
+          });
+          const res = await fetch(url);
+          if (res.status === 404) { alert(`Error: breed fetch for ${value}.`); }
+          // Grab the JSON and make the options
+          // Also assign fetched breeds for caching
+          const json = await res.json();
+          console.log('breeds json', json);
+          fetchedBreeds = json.breeds.map(breedObj => breedObj.name);
+          newOptions.breed= json.breeds.map(breedObj =>
+            this.generateOption(breedObj.name, 'breed'));
+        } catch (err) {
+          console.log(err);
+        }
+      } else {
+        newOptions.breed = this.state.types[value]['breed'];
+      }
+      for (let [searchParam, searchValues] of Object.entries(this.state.types[value])) {
+        if (searchParam !== '_link') {
+          newOptions[searchParam] = searchValues.map(val => 
+            this.generateOption(val, searchParam));
+        }
+      }
+    }
+    console.log(newOptions);
+    this.setState(prevState => {
+      let newState = {
+        types: prevState.types,
+        selected: {
+          ...prevState.selected,
+          [option.props.selectkey]: value,
+        },
+        options: {
+          ...prevState.options,
+          ...newOptions,
+        },
+      };
+      if (fetchedBreeds !== undefined) { newState.types[value]['breed'] = fetchedBreeds; }
+      return newState;
+    });
+    console.log(this.state);
+  }
 
   async componentDidMount() {
     // fetch the types to populate pet search parameters
