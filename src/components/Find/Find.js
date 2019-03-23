@@ -1,12 +1,14 @@
 import buildUrl from 'build-url';
 import fetch from 'node-fetch';
-import { Select, Input } from 'antd';
+import { Col, Form, Input, Row, Select } from 'antd';
 import React, { Component } from 'react';
 import env from '../../env';
+//import './Find.css';
 
 const Option = Select.Option;
 
-export default class Find extends Component {
+
+class Find extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -74,7 +76,7 @@ export default class Find extends Component {
       }
       for (let [searchParam, searchValues] of Object.entries(this.state.types[value])) {
         if (searchParam !== '_link') {
-          newOptions[searchParam] = searchValues.map(val => 
+          newOptions[searchParam] = searchValues.map(val =>
             this.generateOption(val, searchParam));
         }
       }
@@ -163,6 +165,7 @@ export default class Find extends Component {
    * @returns {array} formControls - Controls to help filter pet searches.
    */
   createControlForms() {
+    const { getFieldDecorator } = this.props.form;
     const validParams = this.state.validParams;
     let formControls = [];
 
@@ -185,12 +188,17 @@ export default class Find extends Component {
           defaultValueText = '---';
         }
         formControls.push(
-          <Select key={validParamName}
-            defaultValue={defaultValueText}
-            loading={loading}
-            onSelect={this.onSelect} >
-            {this.state.options[validParamName]}
-          </Select>);
+					<Form.Item key={validParamName} label={validParamName}>
+						{getFieldDecorator(validParamName)
+						(
+							<Select key={validParamName}
+								placeholder={defaultValueText}
+								loading={loading}
+								onSelect={this.onSelect} >
+								{this.state.options[validParamName]}
+							</Select>
+            )}
+					</Form.Item>);
       }
     }
     return formControls;
@@ -198,11 +206,11 @@ export default class Find extends Component {
 
   render() {
     return (
-      <div>
-        <form>
-          {this.createControlForms()}
-        </form>
-      </div>
+			<Form layout="horizontal" className={'ant-advanced-search-form'}>
+					{this.createControlForms()}
+			</Form>
     )
   }
 }
+
+export default Form.create()(Find);
