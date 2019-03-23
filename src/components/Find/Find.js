@@ -169,7 +169,6 @@ class Find extends Component {
     const validParams = this.state.validParams;
     let formControls = [];
 
-    // TODO: Create form labels
     for (let [validParamName, paramDetails] of Object.entries(validParams)) {
       // See what type of control we're dealing with
       const controlType = paramDetails[1];
@@ -187,18 +186,23 @@ class Find extends Component {
           loading = false;
           defaultValueText = '---';
         }
+
+        const labelText = validParamName.charAt(0).toUpperCase() +
+          validParamName.slice(1);
         formControls.push(
-					<Form.Item key={validParamName} label={validParamName}>
-						{getFieldDecorator(validParamName)
-						(
-							<Select key={validParamName}
-								placeholder={defaultValueText}
-								loading={loading}
-								onSelect={this.onSelect} >
-								{this.state.options[validParamName]}
-							</Select>
-            )}
-					</Form.Item>);
+          <Col span={3} key={validParamName}>
+            <Form.Item label={labelText}>
+              {getFieldDecorator(validParamName)
+              (
+                <Select
+                  placeholder={defaultValueText}
+                  loading={loading}
+                  onSelect={this.onSelect} >
+                  {this.state.options[validParamName]}
+                </Select>
+              )}
+            </Form.Item>
+          </Col>);
       }
     }
     return formControls;
