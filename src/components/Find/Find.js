@@ -1,7 +1,8 @@
 import buildUrl from 'build-url';
 import fetch from 'node-fetch';
-import { Col, Form, Input, Row, Select } from 'antd';
+import { Button, Col, Form, Input, Row, Select } from 'antd';
 import React, { Component } from 'react';
+import { Redirect } from 'react-router-dom';
 import env from '../../env';
 //import './Find.css';
 
@@ -16,6 +17,7 @@ class Find extends Component {
       types: {},
       validParams: {},
       options: {},
+      redirect: false,
     };
   }
 
@@ -98,6 +100,17 @@ class Find extends Component {
       return newState;
     });
     console.log(this.state);
+  }
+
+  handleSubmit = (e) => {
+    e.preventDefault();
+    console.log(e);
+    const url = buildUrl('/', {
+      path: 'getSearchResults',
+      queryParams: this.state.selected,
+    });
+    this.setState({ redirect: url });
+    console.log(url);
   }
 
   async componentDidMount() {
@@ -209,9 +222,18 @@ class Find extends Component {
   }
 
   render() {
+    const { redirect } = this.state;
+    if (!!redirect) { return <Redirect to={redirect} />; }
     return (
-			<Form layout="horizontal" className={'ant-advanced-search-form'}>
-					{this.createControlForms()}
+      <Form layout="horizontal" onSubmit={this.handleSubmit}>
+        <Row gutter={3}>
+          {this.createControlForms()}
+        </Row>
+        <Form.Item wrapperCol={{ span: 12, offset: 5 }}>
+          <Button type='primary' htmlType='submit'>
+            Find Pet!
+          </Button>
+        </Form.Item>
 			</Form>
     )
   }
