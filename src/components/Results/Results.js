@@ -1,4 +1,4 @@
-import { List, Avatar, Icon } from 'antd';
+import { List, Icon } from 'antd';
 import fetch from 'node-fetch';
 import React, { Component } from 'react';
 import env from '../../env';
@@ -31,8 +31,14 @@ export default class Results extends Component {
   }
 
   async componentDidMount() {
-    const queryParamsString = this.props.location.search;
-    const url = `${env.apiUrl}/getSearchResults${ queryParamsString}`;
+    let url = '';
+    const path = this.props.location.pathname;
+    if (path === '/favorites') {
+      url = `${env.apiUrl}/favorites`;
+    } else {
+      const queryParamsString = this.props.location.search;
+      url = `${env.apiUrl}/getSearchResults${ queryParamsString }`;
+    }
     console.log(url);
     const res = await fetch(url);
     const json = await res.json();

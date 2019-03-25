@@ -14,6 +14,12 @@ class App extends Component {
           <Menu.Item key='mail'>
             <Link to='/'>Home</Link>
           </Menu.Item>
+          <Menu.Item key='Favorites'>
+            <Link to='favorites'>Favorites</Link>
+          </Menu.Item>
+          <Menu.Item key='Map'>
+            <Link to='Map'>Map</Link>
+          </Menu.Item>
         </Menu>
         <Routes />
       </div>

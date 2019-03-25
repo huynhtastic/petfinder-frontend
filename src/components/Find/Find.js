@@ -1,10 +1,8 @@
 import buildUrl from 'build-url';
-import fetch from 'node-fetch';
 import { Button, Col, Form, Input, Row, Select } from 'antd';
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import env from '../../env';
-//import './Find.css';
 
 const Option = Select.Option;
 
