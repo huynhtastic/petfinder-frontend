@@ -3,12 +3,24 @@ import fetch from 'node-fetch';
 import React, { Component } from 'react';
 import env from '../../env';
 
-const IconText = () => (
+const IconText = ({petid}) => {
+  const handleClick = () => {
+    console.log(petid);
+    fetch(`${env.apiUrl}/change`, {
+      method: 'POST',
+      body: JSON.stringify({ petid: petid }),
+      headers: { 'Content-Type': 'application/json'},
+    });
+  };
+
   // TODO: change star to heart
-  <span>
-    <Icon type='star-o' style={{ marginRight: 8 }} />
-  </span>
-);
+  // TODO: trigger different icon when clicked to show favorited
+  return (
+    <span>
+      <Icon type='star-o' style={{ marginRight: 8 }} onClick={handleClick} />
+    </span>
+  )
+};
 
 export default class Results extends Component {
   constructor(props) {
@@ -44,7 +56,7 @@ export default class Results extends Component {
         renderItem={item => (
           <List.Item
             key={item.id}
-            actions={[<IconText />]}
+            actions={[<IconText petid={item.id} />]}
             extra={<img alt='animal-pic' src={item.photos[0].medium} />}
           >
             <List.Item.Meta title={<a href={item.url}>{item.name}</a>}
