@@ -51,7 +51,6 @@ export class MapContainer extends Component {
   }
 
 	onMarkerClick = (props, marker, e) => {
-    console.log(marker.id);
     this.setState({
       selectedPlace: props,
       activeMarker: marker,
@@ -66,10 +65,6 @@ export class MapContainer extends Component {
         activeMarker: { petid: -1 },
       });
     }
-  };
-
-  determineVisible(marker) {
-    console.log(marker);
   };
 
   makeMarkers() {

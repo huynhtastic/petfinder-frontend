@@ -50,7 +50,7 @@ class Find extends Component {
    */
   onSelect = async (value, option) => {
     let newOptions = {};
-    let fetchedBreeds = undefined;
+    let ftchBreeds = undefined;
     if (option.props.selectkey === 'type') {
       if (!this.state.types[value]['breed']) {
         // We only need to fetch Breeds if it's not there
@@ -65,7 +65,7 @@ class Find extends Component {
           // Also assign fetched breeds for caching
           const json = await res.json();
           console.log('breeds json', json);
-          fetchedBreeds = json.breeds.map(breedObj => breedObj.name);
+          ftchBreeds = json.breeds.map(breedObj => breedObj.name);
           newOptions.breed= json.breeds.map(breedObj =>
             this.generateOption(breedObj.name, 'breed'));
         } catch (err) {
@@ -74,10 +74,10 @@ class Find extends Component {
       } else {
         newOptions.breed = this.state.types[value]['breed'];
       }
-      for (let [searchParam, searchValues] of Object.entries(this.state.types[value])) {
-        if (searchParam !== '_link') {
-          newOptions[searchParam] = searchValues.map(val =>
-            this.generateOption(val, searchParam));
+      for (let [srchParam, srchValues] of Object.entries(this.state.types[value])) {
+        if (srchParam !== '_link') {
+          newOptions[srchParam] = srchValues.map(val =>
+            this.generateOption(val, srchParam));
         }
       }
     }
@@ -94,7 +94,7 @@ class Find extends Component {
           ...newOptions,
         },
       };
-      if (fetchedBreeds !== undefined) { newState.types[value]['breed'] = fetchedBreeds; }
+      if (ftchBreeds !== undefined) newState.types[value]['breed'] = ftchBreeds;
       return newState;
     });
     console.log(this.state);

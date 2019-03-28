@@ -56,7 +56,7 @@ export default class Results extends Component {
           // and footer
           // TODO: change href to non external link
           onChange: (page) => { console.log(page); },
-          pageSize: 3,
+          pageSize: 6,
         }}
         dataSource={this.state.results}
         renderItem={item => (
