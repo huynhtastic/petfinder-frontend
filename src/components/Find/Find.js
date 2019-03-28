@@ -100,6 +100,11 @@ class Find extends Component {
     console.log(this.state);
   }
 
+  /**
+   * Sets the state with each change on an input.
+   *
+   * @param {object} e - Fired event object for the changed input.
+   */
   handleInputChange = (e) => {
     e.persist();
     this.setState(prevState => ({
@@ -110,6 +115,12 @@ class Find extends Component {
     }));
   }
 
+  /**
+   * Handler for form submission that redirects a user to the results page with
+   * a search url to send to the backend.
+   *
+   * @param {object} e - Fired event object for a submit button press.
+   */
   handleSubmit = (e) => {
     e.preventDefault();
     console.log(e);
@@ -121,6 +132,11 @@ class Find extends Component {
     console.log(url);
   }
 
+  /**
+   * Requests search parameters that a user can use to search for specific
+   * animals before a full render is made. Sets the resulting JSON from the API
+   * call to state.
+   */
   async componentDidMount() {
     // fetch the types to populate pet search parameters
     try {
@@ -196,7 +212,6 @@ class Find extends Component {
       if (controlType === 'text') {
         // Create an input contrl
         const controlAttrs = paramDetails[0];
-        // TODO: assign an onChange function
         formControls.push(
           <Input
             id={validParamName}
