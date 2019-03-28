@@ -100,6 +100,16 @@ class Find extends Component {
     console.log(this.state);
   }
 
+  handleInputChange = (e) => {
+    e.persist();
+    this.setState(prevState => ({
+      selected: {
+        ...prevState.selected,
+        [e.target.id]: e.target.value,
+      },
+    }));
+  }
+
   handleSubmit = (e) => {
     e.preventDefault();
     console.log(e);
@@ -187,7 +197,14 @@ class Find extends Component {
         // Create an input contrl
         const controlAttrs = paramDetails[0];
         // TODO: assign an onChange function
-        formControls.push(<Input key={validParamName} {...controlAttrs}  />);
+        formControls.push(
+          <Input
+            id={validParamName}
+            key={validParamName}
+            onChange={this.handleInputChange}
+            {...controlAttrs}
+          />
+        );
       } else if (controlType === 'select') {
         // Create a dropdown control
         let loading = true;
