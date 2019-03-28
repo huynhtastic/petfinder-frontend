@@ -47,7 +47,7 @@ export default class Results extends Component {
   }
 
   render() {
-    return(
+    return (
       <List
         itemLayout='vertical'
         size='large'
@@ -59,19 +59,22 @@ export default class Results extends Component {
           pageSize: 6,
         }}
         dataSource={this.state.results}
-        renderItem={item => (
-          <List.Item
-            key={item.id}
-            actions={[<IconText petid={item.id} />]}
-            extra={<img alt='animal-pic' src={item.photos[0].medium} />}
-          >
-            <List.Item.Meta title={<a href={item.url}>{item.name}</a>}
-              description={`${item.breeds.primary} | ${item.age} | ${item.gender}`}
-            />
-            {item.description}
-          </List.Item>
-        )}
+        renderItem={item => {
+          let src = item.photos[0] ? item.photos[0].medium : '';
+          return (
+            <List.Item
+              key={item.id}
+              actions={[<IconText petid={item.id} />]}
+              extra={<img alt='animal-pic' src={src} />}
+            >
+              <List.Item.Meta title={<a href={item.url}>{item.name}</a>}
+                description={`${item.breeds.primary} | ${item.age} | ${item.gender}`}
+              />
+              {item.description}
+            </List.Item>
+          );
+        }}
         />
-    )
+    );
   }
 }
